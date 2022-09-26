@@ -106,8 +106,8 @@ extension SceneDelegate: TUSClientDelegate {
         print("TUSClient remaining is \(client.remainingUploads)")
     }
     
-    func didFinishUpload(id: UUID, url: URL, context: [String : String]?, client: TUSClient) {
-        print("TUSClient finished upload, id is \(id) url is \(url)")
+    func didFinishUpload(id: UUID, url: URL, context: [String : String]?, responseHeader: [AnyHashable: Any]?, client: TUSClient) {
+        print("TUSClient finished upload, id is \(id) url is \(url), responseHeader is \(String(describing: responseHeader))")
         print("TUSClient remaining is \(client.remainingUploads)")
         if client.remainingUploads == 0 {
             print("Finished uploading")

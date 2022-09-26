@@ -147,7 +147,7 @@ final class TUSAPI {
     ///   - location: The location of where to upload to.
     ///   - completion: Completionhandler for when the upload is finished.
     @discardableResult
-    func upload(data: Data, range: Range<Int>?, location: URL, metaData: UploadMetadata, completion: @escaping (Result<Int, TUSAPIError>) -> Void) -> URLSessionUploadTask {
+    func upload(data: Data, range: Range<Int>?, location: URL, metaData: UploadMetadata, completion: @escaping (Result<HTTPURLResponse, TUSAPIError>) -> Void) -> URLSessionUploadTask {
         let offset: Int
         let length: Int
         if let range = range {
@@ -173,13 +173,11 @@ final class TUSAPI {
         let task = session.uploadTask(request: request, data: data) { result in
             processResult(completion: completion) {
                 let (_, response) = try result.get()
-                
                 guard let offsetStr = response.allHeaderFields[caseInsensitive: "upload-offset"] as? String,
-                      let offset = Int(offsetStr) else {
+                      Int(offsetStr) != nil else {
                     throw TUSAPIError.couldNotRetrieveOffset
                 }
-                return offset
-                
+                return response
             }
         }
         task.resume()

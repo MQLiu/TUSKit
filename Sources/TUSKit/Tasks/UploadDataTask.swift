@@ -19,6 +19,7 @@ final class UploadDataTask: NSObject, IdentifiableTask {
     
     weak var progressDelegate: ProgressDelegate?
     let metaData: UploadMetadata
+    var responseHeader: [AnyHashable: Any]?
     
     let queue = DispatchQueue(label: "com.tuskit.uploadDataTask")
     
@@ -101,13 +102,19 @@ final class UploadDataTask: NSObject, IdentifiableTask {
                 let progressDelegate = self.progressDelegate
                 
                 do {
-                    let receivedOffset = try result.get()
+                    let response = try result.get()
+                    
+                    guard let offsetStr = response.allHeaderFields[caseInsensitive: "upload-offset"] as? String,
+                          let receivedOffset = Int(offsetStr) else {
+                        return
+                    }
                     let currentOffset = metaData.uploadedRange?.upperBound ?? 0
                     metaData.uploadedRange = 0..<receivedOffset
                     
                     let hasFinishedUploading = receivedOffset == metaData.size
                     if hasFinishedUploading {
                         try files.encodeAndStore(metaData: metaData)
+                        self.responseHeader = response.allHeaderFields
                         completed(.success([]))
                         return
                     } else if receivedOffset == currentOffset {

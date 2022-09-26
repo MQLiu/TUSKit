@@ -43,7 +43,7 @@ extension MyClass: TUSClientDelegate {
         print("TUSClient remaining is \(client.remainingUploads)")
     }
     
-    func didFinishUpload(id: UUID, url: URL, client: TUSClient) {
+    func didFinishUpload(id: UUID, url: URL, responseHeader: [AnyHashable: Any]?, client: TUSClient) {
         print("TUSClient finished upload, id is \(id) url is \(url)")
         print("TUSClient remaining is \(client.remainingUploads)")
         if client.remainingUploads == 0 {
